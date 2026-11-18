@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Reconstruction • liste de tâches</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<main class="app">
+			<header>
+				<h1>todos</h1>
+				<input class="new-todo" data-role="nouveau" placeholder="What needs to be done?" aria-label="What needs to be done?" autofocus>
+			</header>
+
+			<section class="main" data-role="zone-liste" hidden>
+				<input id="toggle-all" class="toggle-all" type="checkbox" data-role="tout-cocher">
+				<label for="toggle-all">Mark all as complete</label>
+				<ul class="todo-list" data-role="liste"></ul>
+			</section>
+
+			<footer class="footer" data-role="pied" hidden>
+				<span class="todo-count" data-role="compteur" aria-live="polite"></span>
+				<ul class="filters" data-role="filtres">
+					<li><a href="#/" data-filtre="all">All</a></li>
+					<li><a href="#/active" data-filtre="active">Active</a></li>
+					<li><a href="#/completed" data-filtre="completed">Completed</a></li>
+				</ul>
+				<button class="clear-completed" data-role="vider" type="button" hidden>Clear completed</button>
+			</footer>
+		</main>
+		<p class="aide">Double-click to edit a todo</p>
+		<script type="module" src="js/app.js"></script>
+	</body>
+</html>
