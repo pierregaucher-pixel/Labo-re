@@ -46,3 +46,32 @@
 ## Notes
 - Un avertissement npm signale que `prebuild-install@7.1.3` est déprécié (dépendance transitive, sans impact sur le diagnostic).
 - Journaux complets : `/tmp/rea-doctor.txt` et `/tmp/rea-setup.txt` (sortie brute, conservée hors dépôt).
+
+## Mise à jour — enregistrement MCP au niveau projet
+
+### Procédure suivie
+- La documentation officielle (`docs/getting-started/installation.md`, section enregistrement manuel) recommande l'enregistrement local dans `~/.claude.json` et déconseille `--scope project`, car il écrit `.mcp.json` dans le dépôt.
+- Tu as demandé une configuration dans le dépôt, rechargée à chaque session : j'ai donc suivi la voie projet, avec le CLI et `--no-global`, qui n'écrit que des réglages projet.
+- Commande : `npx -y rea-agents mcp add --agent claude-code --command "npx -y rea-agents@6.9.0 mcp" --no-global`
+  - L'identifiant de client valide est `claude-code` (`claude_code` et `claude` sont refusés).
+  - La commande `npx -y rea-agents@6.9.0 mcp` reprend celle du `mcp.json` du paquet officiel, version épinglée.
+- Fichier créé : `.mcp.json` à la racine du dépôt, entrée `mcpServers.rea` (`npx -y rea-agents@6.9.0 mcp`). Aucun secret.
+
+### Redémarrage de la session
+- Non effectué par moi : je ne peux pas redémarrer la session Claude Code depuis le conteneur. Le serveur `rea` du `.mcp.json` ne sera chargé qu'au prochain démarrage de la session. À faire par l'utilisateur.
+
+### Doctor relancé après enregistrement
+- Toujours `healthy: false`.
+- `registration:claude_code` reste en `config_drift` : le doctor ne contrôle que l'enregistrement utilisateur `/root/.claude.json`, pas le `.mcp.json` projet. Cela correspond à la doc, qui indique que le setup et le doctor ne lisent que l'entrée au niveau utilisateur.
+- `skill:identity` reste en `config_drift` (skill absente, non installée à ce stade).
+- Les cinq moteurs d'analyse restent `missing_analysis_engine`, comme précédemment.
+- `live_server` reste `unknown` tant que la session n'a pas été redémarrée et qu'un outil REA n'a pas été appelé.
+
+### Limites et points de vigilance
+- Un `.mcp.json` de projet est committé : toute personne qui clone le dépôt obtiendra le serveur REA, et Claude Code peut demander une approbation avant de le lancer. La doc met en garde contre ce cas. Si tu préfères la voie locale recommandée, il suffit de retirer `.mcp.json` et d'exécuter `claude mcp add --scope local rea -- <node> <rea.mjs> mcp`.
+- Le setup n'a installé ni la skill ni l'enregistrement utilisateur : le blocage du doctor sur ces deux points n'est pas levé.
+
+### Vérification à faire après redémarrage
+1. Redémarrer la session Claude Code dans ce dépôt, puis vérifier que le serveur `rea` apparaît (`claude mcp list`).
+2. Appeler un outil REA (par exemple `binary_session`) pour tester le serveur.
+3. Relancer `npx -y rea-agents doctor`.
